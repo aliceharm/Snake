@@ -22,7 +22,7 @@ ASnakeElementBase::ASnakeElementBase()
 void ASnakeElementBase::BeginPlay()
 {
 	Super::BeginPlay();
-	MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ASnakeElementBase::HandleBeginOverLap);
+	
 	
 }
 
@@ -41,7 +41,7 @@ void ASnakeElementBase::Tick(float DeltaTime)
 
 void ASnakeElementBase::SetFirstElementType_Implementation()
 {
-//	MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ASnakeElementBase::HandleBeginOverLap);
+	MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ASnakeElementBase::HandleBeginOverLap);
 }
 
 void ASnakeElementBase::Interact(AActor* Interactor, bool bIsHead)
