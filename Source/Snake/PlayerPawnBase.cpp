@@ -6,6 +6,8 @@
 #include "SnakeBase.h"
 #include "Components/InputComponent.h"
 
+bool canTurn = true;
+
 // Sets default values
 APlayerPawnBase::APlayerPawnBase()
 {
@@ -23,12 +25,29 @@ void APlayerPawnBase::BeginPlay()
 	Super::BeginPlay();
 	SetActorRotation(FRotator(-90, 0, 0));
 	CreateSnakeActor();
+
+	
+	
+}
+
+void APlayerPawnBase::SetTutValue(int NewTutValue)
+{
+	if (NewTutValue && IsValid(SnakeActor))
+	{
+
+		tut = SnakeActor->GetFoodCount();
+	}
 }
 
 // Called every frame
 void APlayerPawnBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (IsValid(SnakeActor))
+	{
+		
+		canTurn = true;
+	}
 
 }
 
@@ -48,30 +67,34 @@ void APlayerPawnBase::CreateSnakeActor()
 
 void APlayerPawnBase::HandlePlayerVerticalInput(float value)
 {
-	if (IsValid(SnakeActor))
+	if (IsValid(SnakeActor) && canTurn)
 	{
 		if (value > 0 && SnakeActor->LastMoveDirection != EMovementDirection::DOWN)
 		{
 			SnakeActor->LastMoveDirection = EMovementDirection::UP;
+			canTurn = false;
 		}
 		else if (value < 0 && SnakeActor->LastMoveDirection != EMovementDirection::UP)
 		{
 			SnakeActor->LastMoveDirection = EMovementDirection::DOWN;
+			canTurn = false;
 		}
 	}
 }
 
 void APlayerPawnBase::HandlePlayerHorizontalInput(float value)
 {
-	if (IsValid(SnakeActor))
+	if (IsValid(SnakeActor) && canTurn)
 	{
 		if (value > 0 && SnakeActor->LastMoveDirection != EMovementDirection::LEFT)
 		{
 			SnakeActor->LastMoveDirection = EMovementDirection::RIGHT;
+			canTurn = false;
 		}
 		else if (value < 0 && SnakeActor->LastMoveDirection != EMovementDirection::RIGHT)
 		{
 			SnakeActor->LastMoveDirection = EMovementDirection::LEFT;
+			canTurn = false;
 		}
 	}
 }

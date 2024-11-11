@@ -27,9 +27,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ASnakeBase> SnakeActorClass;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Tut")
+	int tut;
+
+	UFUNCTION(BlueprintCallable, Category = "Tut")
+	void SetTutValue(int NewTutValue);
+
 	protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	
 
 public:	
 	// Called every frame
@@ -45,5 +53,6 @@ public:
 	UFUNCTION()
 	void HandlePlayerHorizontalInput(float value);
 
+	
 
 };

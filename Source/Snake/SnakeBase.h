@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PlayerPawnBase.h"
 #include "SnakeBase.generated.h"
 
 class ASnakeElementBase;
+
 
 UENUM()
 enum class EMovementDirection
@@ -41,6 +43,10 @@ public:
 	UPROPERTY()
 	EMovementDirection LastMoveDirection;
 
+	
+	
+
+
 	UFUNCTION(BlueprintCallable, Category = "Snake")
 	TArray<FVector> GetSnakeBodySegments() const;
 
@@ -70,5 +76,6 @@ public:
 	void SlowDown(float Factor);
 	void Shorten();
 	void SetMovementSpeed(float NewSpeed);
-	
+	APlayerPawnBase* PlayerPawn;
+
 };

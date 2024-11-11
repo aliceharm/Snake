@@ -3,7 +3,10 @@
 
 #include "SnakeBase.h"
 #include "SnakeElementBase.h"
+#include "PlayerPawnBase.h"
+#include "Engine/World.h"
 #include "Interacteble.h"
+
 
 // Sets default values
 ASnakeBase::ASnakeBase()
@@ -34,6 +37,12 @@ TArray<FVector> ASnakeBase::GetSnakeBodySegments() const
 void ASnakeBase::IncrementFoodCount()
 {
 	FoodCount++;
+	
+	
+
+	PlayerPawn = Cast<APlayerPawnBase>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	PlayerPawn->SetTutValue(FoodCount);
+	
 }
 
 int32 ASnakeBase::GetFoodCount() const
@@ -45,6 +54,10 @@ int32 ASnakeBase::GetFoodCount() const
 void ASnakeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+
+	
 	SetActorTickInterval(MovementSpeed);
 	AddSnakeElement(5);
 	
@@ -55,6 +68,7 @@ void ASnakeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	Move();
+	
 }
 
 void ASnakeBase::AddSnakeElement(int ElementsNum)
