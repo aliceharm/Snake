@@ -30,6 +30,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Tut")
 	int tut;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Food")
+	float StarvationNow;
+
+	UFUNCTION(BlueprintCallable, Category = "Food")
+	void SetStarvationNow();
+
 	UFUNCTION(BlueprintCallable, Category = "Tut")
 	void SetTutValue(int NewTutValue);
 
@@ -47,6 +53,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void CreateSnakeActor();
+	void StartSnakeMovement();
 
 	UFUNCTION()
 	void HandlePlayerVerticalInput(float value);

@@ -3,8 +3,11 @@
 
 #include "SnakeElementBase.h"
 #include "Engine/Classes/Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "SnakeGameModeBase.h"
 #include "SnakeBase.h"
 #include "Wall.h"
+
 
 // Sets default values
 ASnakeElementBase::ASnakeElementBase()
@@ -43,6 +46,16 @@ void ASnakeElementBase::Interact(AActor* Interactor, bool bIsHead)
 	if (IsValid(Snake))
 	{
 		Snake->Destroy();
+
+		UWorld* World = GetWorld();
+		if (World != nullptr)
+		{
+			ASnakeGameModeBase* GameMode = Cast<ASnakeGameModeBase>(UGameplayStatics::GetGameMode(World));
+			if (GameMode != nullptr)
+			{
+				GameMode->EndGame(EGameEndCause::LoseGame);
+			}
+		}
 	}
 	
 }
@@ -63,6 +76,16 @@ void ASnakeElementBase::HandleBeginOverLap(UPrimitiveComponent* OverlappedCompon
 		// ”ничтожить змею при столкновении со стеной
 		if (IsValid(SnakeOwner))
 			{
+			UWorld* World = GetWorld();
+			if (World != nullptr)
+			{
+				ASnakeGameModeBase* GameMode = Cast<ASnakeGameModeBase>(UGameplayStatics::GetGameMode(World));
+				if (GameMode != nullptr)
+				{
+					GameMode->EndGame(EGameEndCause::LoseGame);
+					Destroy();
+				}
+			}
 			SnakeOwner->Destroy();
 					}
 	}

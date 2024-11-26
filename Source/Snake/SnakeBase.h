@@ -28,6 +28,12 @@ public:
 	// Sets default values for this actor's properties
 	ASnakeBase();
 
+	
+	float TimeSinceLastFood;
+	float MaxTime;
+	bool bIsAlive;
+	bool bIsMoving;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ASnakeElementBase> SnakeElementClass;
 
@@ -36,6 +42,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	float MovementSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	int MaxFood;
 
 	UPROPERTY()
 	TArray<ASnakeElementBase*> SnakeElements;
@@ -52,11 +61,14 @@ public:
 
 	void IncrementFoodCount();
 	int32 GetFoodCount() const;
+	float GetTimeSinceLastFood() const;
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 FoodCount;
@@ -76,6 +88,7 @@ public:
 	void SlowDown(float Factor);
 	void Shorten();
 	void SetMovementSpeed(float NewSpeed);
+	void StartMovement();
 	APlayerPawnBase* PlayerPawn;
 
 };

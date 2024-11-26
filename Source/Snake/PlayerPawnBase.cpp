@@ -30,6 +30,15 @@ void APlayerPawnBase::BeginPlay()
 	
 }
 
+void APlayerPawnBase::SetStarvationNow()
+{
+	if (IsValid(SnakeActor))
+	{
+
+		StarvationNow = SnakeActor->GetTimeSinceLastFood();
+	}
+}
+
 void APlayerPawnBase::SetTutValue(int NewTutValue)
 {
 	if (NewTutValue && IsValid(SnakeActor))
@@ -43,6 +52,7 @@ void APlayerPawnBase::SetTutValue(int NewTutValue)
 void APlayerPawnBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	SetStarvationNow();
 	if (IsValid(SnakeActor))
 	{
 		
@@ -57,7 +67,16 @@ void APlayerPawnBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("Vertical", this, &APlayerPawnBase::HandlePlayerVerticalInput);
 	PlayerInputComponent->BindAxis("Horizontal", this, &APlayerPawnBase::HandlePlayerHorizontalInput);
+	PlayerInputComponent->BindAction("StartMovement", IE_Pressed, this, &APlayerPawnBase::StartSnakeMovement);
 
+}
+
+void APlayerPawnBase::StartSnakeMovement()
+{
+	if (IsValid(SnakeActor))
+	{
+		SnakeActor->bIsMoving = true;// Запускаем движение змеи
+	}
 }
 
 void APlayerPawnBase::CreateSnakeActor()

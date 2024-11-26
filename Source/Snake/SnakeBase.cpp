@@ -1,48 +1,73 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "SnakeBase.h"
 #include "SnakeElementBase.h"
 #include "PlayerPawnBase.h"
 #include "Engine/World.h"
 #include "Interacteble.h"
+#include "Kismet/GameplayStatics.h"
+#include "SnakeGameModeBase.h"
 
 
-// Sets default values
 ASnakeBase::ASnakeBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	ElementSize = 100.f;
 	MovementSpeed = 100.f;
 	LastMoveDirection = EMovementDirection::DOWN;
 	FoodCount = 0;
+	MaxFood = 50;
+	TimeSinceLastFood = 0.0f;
+	MaxTime = 20.0f;
+	bIsAlive = true;
+	bIsMoving = false;
 }
 
-
+void ASnakeBase::StartMovement()
+{
+	bIsMoving = true; // Устанавливаем флаг, что движение начато
+}
 
 TArray<FVector> ASnakeBase::GetSnakeBodySegments() const
 {
 	TArray<FVector> BodyPositions;
-	
 	for (const auto& Element : SnakeElements)
 		{
 		BodyPositions.Add(Element->GetActorLocation());
 		// Добавляем позицию элемента в массив
 	}
-
 	return BodyPositions; // Возвращаем массив позиций
 }
 
 void ASnakeBase::IncrementFoodCount()
 {
 	FoodCount++;
-	
-	
-
+	TimeSinceLastFood = 0.0f;
 	PlayerPawn = Cast<APlayerPawnBase>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	PlayerPawn->SetTutValue(FoodCount);
-	
+
+	if (FoodCount == 15)
+	{
+		SlowDown(0.8);
+	}
+
+	if (FoodCount == 30)
+	{
+		SlowDown(0.8);
+	}
+
+	if (FoodCount == MaxFood)
+	{
+		UWorld* World = GetWorld();
+		if (World != nullptr)
+		{
+			ASnakeGameModeBase* GameMode = Cast<ASnakeGameModeBase>(UGameplayStatics::GetGameMode(World));
+			if (GameMode != nullptr)
+			{
+				GameMode->EndGame(EGameEndCause::WinGame);
+				Destroy();
+			}
+		}
+	}
 }
 
 int32 ASnakeBase::GetFoodCount() const
@@ -50,14 +75,15 @@ int32 ASnakeBase::GetFoodCount() const
 	return FoodCount;
 }
 
+float ASnakeBase::GetTimeSinceLastFood() const
+{
+	return TimeSinceLastFood;
+}
+
 // Called when the game starts or when spawned
 void ASnakeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
-
-	
 	SetActorTickInterval(MovementSpeed);
 	AddSnakeElement(5);
 	
@@ -67,8 +93,28 @@ void ASnakeBase::BeginPlay()
 void ASnakeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Move();
-	
+	if (bIsAlive && bIsMoving) // Добавляем проверку на bIsMoving
+	{
+		Move();
+		if (bIsAlive)
+		{
+			TimeSinceLastFood += DeltaTime;
+			// Проверка на смерть
+			if (TimeSinceLastFood >= MaxTime)
+			{
+				UWorld* World = GetWorld();
+				if (World != nullptr)
+				{
+					ASnakeGameModeBase* GameMode = Cast<ASnakeGameModeBase>(UGameplayStatics::GetGameMode(World));
+					if (GameMode != nullptr)
+					{
+						GameMode->EndGame(EGameEndCause::TimeLost);
+					}
+				}
+				Destroy(); // Если прошло 20 секунд, делаем змею мертвой
+			}
+		}
+	}
 }
 
 void ASnakeBase::AddSnakeElement(int ElementsNum)
@@ -78,13 +124,11 @@ void ASnakeBase::AddSnakeElement(int ElementsNum)
 		FVector NewLocation;
 		if (SnakeElements.Num() > 0)
 		{
-
 			FVector LastElementLocation = SnakeElements.Last()->GetActorLocation();
 			NewLocation = LastElementLocation;
 		}
 		else
 		{
-
 			NewLocation = FVector(0, 0, 0);
 		}
 		FTransform NewTransform(NewLocation);
@@ -94,10 +138,8 @@ void ASnakeBase::AddSnakeElement(int ElementsNum)
 		if (ElemIndex == 0)
 		{
 			NewSnakeElem->SetFirstElementType();
-
 		}
 	}
-	
 }
 
 void ASnakeBase::Move()
@@ -121,9 +163,7 @@ void ASnakeBase::Move()
 	case EMovementDirection::RIGHT:
 		MovementVector.Y -= ElementSize;
 		break;
-
 	}
-	//AddActorWorldOffset(MovementVector);
 	SnakeElements[0]->ToggleCollision();
 	for (int i = SnakeElements.Num() - 1; i > 0; i--)
 	{
@@ -134,8 +174,6 @@ void ASnakeBase::Move()
 	}
 	SnakeElements[0]->AddActorWorldOffset(MovementVector);
 	SnakeElements[0]->ToggleCollision();
-
-
 }
 
 void ASnakeBase::SnakeElementOverlap(ASnakeElementBase* OverLappedElement, AActor* Other)
@@ -168,17 +206,8 @@ bool ASnakeBase::IsInSnake(const FVector& Location)
 void ASnakeBase::SlowDown(float Factor)
 {
 	MovementSpeed *= Factor;
-	//if (MovementSpeed < 50.f)
-	//{
-	//	MovementSpeed = 50.f; // Минимальная скорость
-	//}
-	//else if (MovementSpeed > 150.f)
-	//{
-	//	MovementSpeed = 150.f; // Максимальная скорость
-	//}
 	SetMovementSpeed(MovementSpeed);
-
-	}
+}
 void ASnakeBase::SetMovementSpeed(float NewSpeed)
 {
 	if (NewSpeed >= 0)
@@ -194,5 +223,4 @@ void ASnakeBase::Shorten()
 	{
 		SnakeElements.Pop(); // Удаляем последний сегмент из тела змеи
 	}
-
 }

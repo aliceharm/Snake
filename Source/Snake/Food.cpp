@@ -11,6 +11,7 @@
 #include "FoodShorten.h"
 #include "FoodSlow.h"
 #include "Wall.h"
+#include "SnakeGameModeBase.h"
 
 
 
@@ -51,6 +52,8 @@ void AFood::Interact(AActor* Interactor, bool bIsHead)
             
             Snake->AddSnakeElement();
             SpawnNewFood(Snake);
+
+            
             DestroyFood();
         }
 
@@ -146,7 +149,7 @@ bool AFood::IsLocationOccupied(const FVector& Location, ASnakeBase* Snake)
     }
 
     // Дополнительная проверка расстояния от тела змеи
-    float MinimumDistance = 100.0f; // Установите минимальное расстояние, которое необходимо соблюдать
+    float MinimumDistance = 100.0f; 
     TArray<AActor*> OverlappingActors;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASnakeBase::StaticClass(), OverlappingActors);
 
